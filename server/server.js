@@ -26,6 +26,7 @@ app.get('/', function(request, response) {
 
 //set up the server on env.PORT or 8080
 var port = process.env.PORT || 8080;
+
 app.listen(port, function(err) {
   if(err) {
     return console.log('Error occurred: ', err);
