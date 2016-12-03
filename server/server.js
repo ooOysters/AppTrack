@@ -1,30 +1,28 @@
 // const mongodb = require('mongodb');
 // var mongoose = require('mongoose');
+
+require('dotenv').config();
 const express = require('express');
 const path = require('path');
 const bodyParser = require('body-parser');
+const mongoose = require('mongoose');
 
 //call express as app
-const app = express();
+var app = express();
 
 //Setting up paths for frontend
-module.exports = (app, express) => {
-  app.use(express.static(path.join(__dirname, '/../node_modules')));
-  app.use(express.static(path.join(__dirname, '/../client')));
-};
+app.use(express.static(path.join(__dirname, '/../node_modules')));
+app.use(express.static(path.join(__dirname, '/../client')));
+app.use(bodyParser.urlencoded({extended: true}));
+app.use(bodyParser.json());
 
 //connect to mongo database named 'AppTrack'
 //heroku, make project, mlab is available as heroku add-on
 
-//const url = 'mongodb://localhost/AppTrack';
-//mongoose.connect(url);
-
-//Display the index as homepage
-app.get('/',(request, response) => {
-  response.sendfile('client/index.html');
-});
-
-app.post('/',(request, response) => {
+let url = 'mongodb://' + process.env.DB_USER + ':' + process.env.DB_PASS + '@ds119608.mlab.com:19608/apptrakdb';
+mongoose.connect(url);
+console.log(url)
+app.post('/form',(request, response) => {
 	console.log(request.body);
 })
 
@@ -36,3 +34,5 @@ app.listen(port, (err) => {
   }
   console.log('Server is listening on port: ', port);
 })
+
+// module.exports = app;
