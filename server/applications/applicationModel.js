@@ -4,26 +4,23 @@ const mongoose = require('mongoose');
 // Any changes to the form should be reflected in this schema.
 // This is used only with the endpoint '/form' in the server file.
 
-
-const PositionSchema = new mongoose.Schema({
-	startDate: String,
+const ApplicationSchema = new mongoose.Schema({
+	userId: String,
+	startDate: Date,
 	companyName: String,
 	role: String,
+	coverLetter: String,
 	jobDescription: String,
 	appliedThrough: String,
 	contactName: String,
 	contactPhone: Number,
 	contactEmail: String,
 	contactType: String,
-	dateApplied: String,
-	dateOfLastContact: String,
+	dateApplied: Date,
+	dateOfLastContact: Date,
 	replyReceived: Boolean,
 	stages: Array,
-	contractTime: Number,
-	initialComp: Number,
-	negotiated: Boolean,
-	finalComp: Number,
-	acceptReject: Boolean
+	isOpen: Boolean
 })
 
-module.exports = mongoose.model('Position', PositionSchema);
+module.exports = mongoose.model('Application', ApplicationSchema);

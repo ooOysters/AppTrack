@@ -1,58 +1,50 @@
-const User = require('./userModel.js');
-// this file posts is not currently used
+const userModel = require('./userModel.js');
+const jwt = require('jwt-simple');
+const bcrypt = require('bcrypt-nodejs');
 
 
 module.exports = {
-	signUp: function(req, res) {
-	  var username = req.body.data.username;
-	  var password = req.body.data.password;
-
-	  User.find({ username: username },
-	    function(err, user) {
+	signUp({ body: { username, password, email } }, res) {
+	  userModel.findOne({ username: username })
+	    .exec((err, user) => {
 	      if (!user) {
-	        var newUser = new User({
-	          username: username,
-	          password: password
-	        });
-
-	        newUser.save(function(err, newUser) {
-	          if (err) {
-	            res.status(500).send(err);
-	          }
-	          createSession(req, res, newUser);
-	        });
+					bcrypt.hash(password, null, null, (err, hash) => {
+						var newUser = new userModel({
+							username: username,
+							password: hash,
+							email: email
+						});
+						newUser.save(function(err, newUser) {
+							if (err) {
+								res.status(500).send(err);
+							}
+							var token = jwt.encode(newUser, 'apptrak')
+							res.json(token);
+						});
+					})
 	      } else {
 	        console.log('Account already exists');
+	        res.sendStatus(401);
 	      }
 	    });
 	},
 
-
-  signIn: function(req, res) {
-		User.find({ username: req.body.data.username },
-		  function(err, user) {
+	signIn( { body: { username, password } }, res) {
+	  userModel.findOne({ username: username })
+	    .exec(function(err, user) {
 	      if (!user) {
-		  		console.log('User not found! Have you signed up yet?');
-		  	}
-
-		  	if (user) {
-		  		if (req.body.data.password === user.password) {
-		  			createSession(req, res, user);
-		  		} else {
-		  			console.log('Authentication failed.')
-		  		}
-		  	}
-
-		  	if (err) {
-		  		console.log(err);
-		  	}
-		  })
-	},
-
-  createSession: function(req, res, newUser) {
-	  return req.session.regenerate(function() {
-	      req.session.user = newUser;
-	      res.redirect('/');
+	        res.sendStatus(401);
+	      } else {
+	        bcrypt.compare(password, user.password, function(err, results) {
+	          if (results) {
+							console.log("USER WHEN SIGN IN: ", user);
+							var token = jwt.encode(user, 'apptrak');
+							res.send(token);
+	          } else {
+							res.sendStatus(401);
+	          }
+	        });
+	      }
 	    });
 	}
 }

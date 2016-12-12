@@ -1,12 +1,13 @@
-var mongoose = require('mongoose');
-// this file describes the userSchema for how mongoose writes to the database
-// this is only used in the sign up endpoint
-
-
+const mongoose = require('mongoose');
+const bcrypt = require('bcrypt-nodejs');
+const Promise = require('bluebird');
 
 var UserSchema = new mongoose.Schema({
   username: { type: String, required: true, index: { unique: true } },
-  password: { type: String, required: true }
+  password: { type: String, required: true },
+  email: { type: String, require: true }
 });
 
-module.exports = mongoose.model('User', UserSchema);
+var User = mongoose.model('User', UserSchema);
+
+module.exports = User;
